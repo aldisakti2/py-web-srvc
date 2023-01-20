@@ -10,7 +10,7 @@ expender_bar = st.expander("About")
 expender_bar.markdown("""
             * ***Data Source:*** [Basketball-reference.com](https://www.basketball-reference.com/)  
             * ***Anggota Kelompok Tugas Besar Pemrograman Fungsional:***
-            1. Aldi (2110)
+            1. Aldi (21102270)
             2. Agyl (21102291)
             3. Reynant (21102326)        
             """)
