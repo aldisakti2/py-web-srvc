@@ -2,6 +2,7 @@ import streamlit as st #lib to build web app
 import pandas as pd #lib to handle dataframe and webscrapping
 import matplotlib.pyplot as plt #to create plot
 import plotly.express as px
+import altair as alt
 import base64   #to handle data download (csv file)
 
 st.set_page_config(page_title="NBA STATS",layout="wide")
@@ -26,8 +27,9 @@ selected_year = st.sidebar.selectbox('Year', list(reversed(range(1970,2021))))
 # web scraping
 # data pre processing
 
-@st.cache
+@st.cache(allow_output_mutation=True)
 def load_data(year):
+    
     url = "https://www.basketball-reference.com/leagues/NBA_" + str(year) + "_per_game.html"
     html = pd.read_html(url, header = 0)
     df = html[0]
@@ -58,8 +60,8 @@ st.header(":basketball: Dashboard")
 st.markdown("""
             **Display Plyer Stats of Selected Filter**
             """)
-st.write('Data Dimension: ' + str(df_selected_team.shape[0]) + ' rows and ' + str(df_selected_team.shape[1]) + ' columns.')
-st.write('Total of Players: ', df_rows) 
+#st.write('Data Dimension: ' + str(df_selected_team.shape[0]) + ' rows and ' + str(df_selected_team.shape[1]) + ' columns.')
+#st.write('Total of Players: ', df_rows) 
 st.dataframe(df_selected_team)
 
 
@@ -72,35 +74,26 @@ def filedownload(df):
     return href
 
 st.markdown(filedownload(df_selected_team), unsafe_allow_html=True)
-"""
+
 # visualization
 #1 bar chart
+x1 = (playerstats.nlargest(10, ['G']))
 
-
-total_game_by_team = (
-    playerstats.groupby(by=["G"]).sum()[["Tm"]].sort_values(by="Tm")
-)
-
-fig_total_game_by_team = px.bar(
-    total_game_by_team,
-    x = "Tm",
-    y = total_game_by_team.index,
-    orientation = "h",
-    title = "<b> GAME by TEAM </b>",
-    color_discrete_sequence=["#0083B8"] * len(total_game_by_team),
+fig_x1 = px.bar(
+    x1,
+    x="Player",
+    y='G',
+    orientation="v",
+    color_discrete_sequence=["#0083B8"] * len(x1),
     template="plotly_white",
 )
 
-fig_total_game_by_team.update_layout(
+fig_x1.update_layout(
     plot_bgcolor="rgba(0,0,0,0)",
     xaxis=(dict(showgrid=False)),
     barmode='group'
 )
 
-#BAR CHART
 if st.button('Bar Chart'):
-    st.plotly_chart(fig_total_game_by_team, theme="streamlit", use_container_width=True)
-    
-"""
-
-
+    st.header('Top 10 Most Played Player 2020')
+    st.plotly_chart(fig_x1, theme="streamlit", use_container_width=True)
