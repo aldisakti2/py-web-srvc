@@ -12,7 +12,7 @@ expender_bar.markdown("""
             * ***Anggota Kelompok Tugas Besar Pemrograman Fungsional:***
             1. Aldi (2110)
             2. Agyl (21102291)
-            3. Reynant (2110)        
+            3. Reynant (21102326)        
             """)
 st.markdown("""
             ---
