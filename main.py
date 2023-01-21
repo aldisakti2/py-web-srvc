@@ -1,10 +1,9 @@
 import streamlit as st #lib to build web app
 import pandas as pd #lib to handle dataframe and webscrapping
 import matplotlib.pyplot as plt #to create plot
-import plotly.express as px
+import plotly.express as px #to create pixel bar
 import base64   #to handle data download (csv file)
 from datetime import date as dt #for get most recent year
-import altair as alt
 
 st.set_page_config(page_title="NBA STATS",layout="wide")
 st.title("VISUALIZATION DATA NBA STATS USING STREAMLIT")
