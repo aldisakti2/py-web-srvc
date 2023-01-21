@@ -46,6 +46,15 @@ def load_data(year):
 
 playerstats = load_data(selected_year) #custom function retrieve nba player stat by selected year
 
+#Make list for column name with numeric data
+numeric_col = [i for i in playerstats.columns.unique() if i not in ['Player','Pos','Tm']]
+
+#Make list for column name with float data
+float_col = [i for i in numeric_col if i not in ['Age', 'G', 'GS']]
+
+#Reformat data type of column with numeric data
+playerstats[numeric_col] = playerstats[numeric_col].apply(pd.to_numeric)
+
 # sidebar team
 sorted_unique_team = sorted(playerstats.Tm.unique())
 selected_team = st.sidebar.multiselect('Team',sorted_unique_team,sorted_unique_team)
@@ -61,7 +70,7 @@ selected_age = st.sidebar.multiselect('Age', age_unique,age_unique)
 # Filtering data
 df_selected_team = playerstats[(playerstats.Tm.isin(selected_team)) & (playerstats.Pos.isin(selected_pos)) & (playerstats.Age.isin(selected_age))]
 
-df_rows = len(df_selected_team.Player.drop_duplicates())
+df_rows = len(df_selected_team.Player.drop_duplicates()) #Get length of column and drop duplicate data when count it
 
 st.header(":basketball: Dashboard")
 st.markdown("""
@@ -69,7 +78,7 @@ st.markdown("""
             """)
 st.write('Total of Players: ', df_rows)
 
-st.dataframe(df_selected_team.style.format(subset=['PTS'], formatter="{:.1f}"))
+st.dataframe(df_selected_team.style.format(subset=float_col, formatter="{:.1f}")) #formatting with just 1 digit after comma at 'PTS' column
 
 
 # Download NBA player stats data
@@ -82,11 +91,13 @@ def filedownload(df):
 st.markdown(filedownload(df_selected_team), unsafe_allow_html=True)
 
 # visualization
-#1 bar chart
+# bar chart
 
-playerstats['PTS'] = playerstats['PTS'].astype(float)
+#sorting player by it's 'PTS' as descending and just show top 10
 x1 = playerstats.sort_values(['PTS'],ascending=False).head(10)
-#x1 = (playerstats.nlargest(10,'G').index.unique())
+
+#sorting player by it's 'G' and just show top 10
+x2 = playerstats.nlargest(10, ['G'])
 
 fig_x1 = px.bar(
     x1,
@@ -103,7 +114,34 @@ fig_x1.update_layout(
     barmode='group'
 )
 
-if st.button('Bar Chart'):
+fig_x2 = px.bar(
+    x2,
+    x="Player",
+    y='G',
+    orientation="v",
+    color_discrete_sequence=["#0083B8"] * len(x2),
+    template="plotly_white",
+)
+
+fig_x2.update_layout(
+    plot_bgcolor="rgba(0,0,0,0)",
+    xaxis=(dict(showgrid=False)),
+    barmode='group'
+)
+
+if st.button('TOP 10 MOST SCORED PLAYER'):
     st.header(f'Top 10 Most Scored Player {selected_year}')
     st.plotly_chart(fig_x1, theme="streamlit", use_container_width=True)
 
+if st.button('TOP 10 MOST PLAYED PLAYER'):
+    st.header(f'Top 10 Most Played Player {selected_year}')
+    st.plotly_chart(fig_x2, theme="streamlit", use_container_width=True)
+
+###hide streamlit footer
+hide_st_style = """
+                <style>
+                #MainMenu {visibility: hidden;}
+                footer {visibility: hidden;}
+                header {visibility: hidden;}
+"""
+st.markdown(hide_st_style, unsafe_allow_html=True)
