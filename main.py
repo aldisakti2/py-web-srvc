@@ -40,6 +40,9 @@ def load_data(year):
     playerstats = raw.drop(['Rk'], axis = 1)
     return playerstats
 playerstats = load_data(selected_year) #custom function retrieve nba player stat by selected year
+playerstats.index = playerstats.index.astype('int')
+playerstats['PTS'] = playerstats['PTS'].astype(float)
+playerstats['G'] = pd.to_numeric(playerstats['G'], errors='coerce')
 
 # sidebar team
 sorted_unique_team = sorted(playerstats.Tm.unique())
@@ -63,7 +66,7 @@ st.markdown("""
             """)
 #st.write('Data Dimension: ' + str(df_selected_team.shape[0]) + ' rows and ' + str(df_selected_team.shape[1]) + ' columns.')
 #st.write('Total of Players: ', df_rows) 
-st.dataframe(df_selected_team)
+st.dataframe(df_selected_team.style.format(subset=['PTS'], formatter="{:.1f}"))
 
 
 # Download NBA player stats data
@@ -78,10 +81,8 @@ st.markdown(filedownload(df_selected_team), unsafe_allow_html=True)
 
 # visualization
 #1 bar chart
-playerstats['G'] = pd.to_numeric(playerstats['G'], errors='coerce')
-x1 = (playerstats.nlargest(10, ['G']))
 
-playerstats['PTS'] = playerstats['PTS'].astype(float)
+x1 = (playerstats.nlargest(10, ['G']))
 x2 = playerstats.sort_values(['PTS'],ascending=False).head(10)
 
 
