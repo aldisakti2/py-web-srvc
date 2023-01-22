@@ -46,10 +46,10 @@ def load_data(year):
 playerstats = load_data(selected_year) #custom function retrieve nba player stat by selected year
 
 #Make list for column name with numeric data
-numeric_col = [i for i in playerstats.columns.unique() if i not in ['Player','Pos','Tm']]
+numeric_col = list(filter(lambda col: (col not in ['Player','Pos','Tm']),playerstats))
 
 #Make list for column name with float data
-float_col = [i for i in numeric_col if i not in ['Age', 'G', 'GS']]
+float_col = list(filter(lambda flo: (flo not in ['Age','G','GS']), numeric_col))
 
 #Reformat data type of column with numeric data
 playerstats[numeric_col] = playerstats[numeric_col].apply(pd.to_numeric)
